@@ -62,7 +62,7 @@ def eval_genomes(genomes, config):
             nnOutput = net.activate(imgarray)
 
             ob, rew, done, info = env.step(nnOutput)
-            imgarray.clear()
+            #imgarray.clear()
 
             score = info['score']
 
