@@ -4,6 +4,7 @@ import cv2          #pip install opencv-python==4.1.2.30
 import neat         #pip install neat-python
 import pickle       #pip install pickle
 
+#Swap BalloonFight with Arkanoid and vice versa
 env = retro.make('BalloonFight-Nes', 'Level1')
 imgarray = []
 def eval_genomes(genomes, config):
