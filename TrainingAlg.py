@@ -77,7 +77,7 @@ def eval_genomes(genomes, config):
             if fitness_current > current_max_fitness:
                 current_max_fitness = fitness_current
                 counter = 0
-                fitness += 1
+                #fitness += 1
             else:
                 counter += 1
 
