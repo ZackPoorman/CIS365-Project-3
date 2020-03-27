@@ -20,8 +20,8 @@ class Worker(object):
 
         fitness = 0
         done = False
-        net = neat.nn.FeedForwardNetwork.create(self.genome, self.config)
-        imgarray = []
+        ann = neat.nn.FeedForwardNetwork.create(self.genome, self.config)
+        screen_input = []
 
         cv2.namedWindow("Main", cv2.WINDOW_NORMAL)
 
@@ -30,21 +30,21 @@ class Worker(object):
             #self.env.render()
 
             #Displays the games as AI sees it but with color
-            scaledimg = cv2.cvtColor(ob, cv2.COLOR_BGR2RGB)
-            scaledimg = cv2.resize(scaledimg, (iny, inx))
+            screen_scaled = cv2.cvtColor(ob, cv2.COLOR_BGR2RGB)
+            screen_scaled = cv2.resize(screen_scaled, (iny, inx))
 
             #Resize the screen input for faster computation
             ob = cv2.resize(ob, (inx, iny))
             ob = cv2.cvtColor(ob, cv2.COLOR_BGR2GRAY)
             ob = np.reshape(ob, (inx, iny))
             
-            cv2.imshow('main', scaledimg)
+            cv2.imshow('main', screen_scaled)
             cv2.waitKey(1)
 
             #Flatten screen into single row of input
-            imgarray = np.ndarray.flatten(ob)
+            screen_input = np.ndarray.flatten(ob)
 
-            actions = net.activate(imgarray)
+            actions = ann.activate(screen_input)
             ob, rew, done, info = self.env.step(actions)
 
             #Evaluating Genome
@@ -52,7 +52,7 @@ class Worker(object):
         print(fitness)    
         return fitness
 
-def eval_genomes(genome, config):
+def evaluate_genomes(genome, config):
 
     worker = Worker(genome, config)
     return worker.work()
@@ -72,7 +72,7 @@ p.add_reporter(stats)
 p.add_reporter(neat.Checkpointer(10))
 
 #Set the first parameter to number of cores to use
-pe = neat.ParallelEvaluator(2, eval_genomes)
+pe = neat.ParallelEvaluator(2, evaluate_genomes)
 
 winner = p.run(pe.evaluate)
 

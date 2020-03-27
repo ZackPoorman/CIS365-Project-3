@@ -6,8 +6,8 @@ import pickle       #pip install pickle
 
 #Swap BalloonFight with Arkanoid and vice versa
 env = retro.make('BalloonFight-Nes', 'Level1')
-imgarray = []
-def eval_genomes(genomes, config):
+screen_input = []
+def evaluate_genomes(genomes, config):
     for genome_id, genome in genomes:
 
         #image of screen @ time of action
@@ -22,12 +22,12 @@ def eval_genomes(genomes, config):
         inx = int(inx/8)
         iny = int(iny/8)
 
-        net = neat.nn.recurrent.RecurrentNetwork.create(genome, config)
+        ann = neat.nn.recurrent.RecurrentNetwork.create(genome, config)
 
-        current_max_fitness = 0
-        fitness_current = 0
+        curr_max_fitness = 0
+        fitness = 0
         frame = 0
-        counter = 0
+        incr = 0
         score = 0
         score_max = 0
         done = False
@@ -57,35 +57,35 @@ def eval_genomes(genomes, config):
             #cv2.waitKey(1)
             
             #Flatten screen for input
-            imgarray = np.ndarray.flatten(ob)
+            screen_input = np.ndarray.flatten(ob)
             
-            nnOutput = net.activate(imgarray)
+            nnOutput = ann.activate(screen_input)
 
             ob, rew, done, info = env.step(nnOutput)
-            #imgarray.clear()
+            #screen_input.clear()
 
             score = info['score']
 
             #For a basic neat alg comment this if statement
             if score > score_max:
-                fitness_current += 1
+                fitness += 1
                 score_max = score
             
             #Uncomment this for the basic neat alg
-            #fitness_current += rew
+            #fitness += rew
 
-            if fitness_current > current_max_fitness:
-                current_max_fitness = fitness_current
-                counter = 0
+            if fitness > curr_max_fitness:
+                curr_max_fitness = fitness
+                incr = 0
                 #fitness += 1
             else:
-                counter += 1
+                incr += 1
 
-            if done or counter == 250:
+            if done or incr == 250:
                 done = True
-                print(genome_id, fitness_current)
+                print(genome_id, fitness)
 
-            genome.fitness = fitness_current
+            genome.fitness = fitness
 
 config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                      neat.DefaultSpeciesSet, neat.DefaultStagnation,
@@ -100,7 +100,7 @@ stats = neat.StatisticsReporter()
 p.add_reporter(stats)
 p.add_reporter(neat.Checkpointer(10))
 
-winner = p.run(eval_genomes)
+winner = p.run(evaluate_genomes)
 
 #Saves current ANN
 with open('winner.pkl', 'wb') as output:
