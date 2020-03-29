@@ -32,13 +32,21 @@ def evaluate_genomes(genomes, config):
         score_max = 0
         done = False
 
-
+        #We have to adjust for level changes
+        prevScreenInput = None
+        noScreenChange = False
         #Uncomment to show what ANN sees
         #cv2.namedWindow("main", cv2.WINDOW_NORMAL)
 
         while not done:
-            #comment out to show what ANN sees
+            #comment out to hide what ANN sees
             env.render()
+            
+            """
+            The bottom of the main stages only contains water; use the
+            water pixel to tell if we're changing levels OR on a bonus stage or not.
+            """
+            newLevel = (np.array_equal(ob[len(ob)-1][len(ob)-1],[0,0,168]))
             
             frame += 1
             #Scaledimg is used for showing ANN visually
@@ -59,6 +67,10 @@ def evaluate_genomes(genomes, config):
             #Flatten screen for input
             screen_input = np.ndarray.flatten(ob)
             
+            noScreenChange = (np.array_equal(prevScreenInput,screen_input))
+                
+            prevScreenInput = screen_input
+            
             nnOutput = ann.activate(screen_input)
 
             ob, rew, done, info = env.step(nnOutput)
@@ -74,16 +86,21 @@ def evaluate_genomes(genomes, config):
             #Uncomment this for the basic neat alg
             #fitness += rew
 
+            #Reset done counter if fitness is increased from previous best
             if fitness > curr_max_fitness:
                 curr_max_fitness = fitness
                 incr = 0
-                #fitness += 1
-            else:
+            #if it's a bonus stage, reset the done counter
+            elif not newLevel:
+                incr = 0
+            #if there was not a screen change, increment the done counter
+            elif not noScreenChange:
                 incr += 1
+                print(incr)
 
-            if done or incr == 250:
+            if done or incr == 500:
                 done = True
-                print(genome_id, fitness)
+                print("Genome ID: " + str(genome_id) + " Fitness: " + str(fitness))
 
             genome.fitness = fitness
 
@@ -93,6 +110,7 @@ config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
 
 #Creates the population based on the config file
 p = neat.Population(config)
+p = neat.Checkpointer.restore_checkpoint("neat-checkpoint-24")
 
 #Creates statistics for each generation
 p.add_reporter(neat.StdOutReporter(True))
