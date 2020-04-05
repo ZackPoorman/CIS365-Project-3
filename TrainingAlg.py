@@ -96,11 +96,10 @@ def evaluate_genomes(genomes, config):
             #if there was not a screen change, increment the done counter
             elif not noScreenChange:
                 incr += 1
-                print(incr)
 
-            if done or incr == 500:
+            if done or incr == int(500 + frame / 50):
                 done = True
-                print("Genome ID: " + str(genome_id) + " Fitness: " + str(fitness))
+                print("Genome ID: " + str(genome_id) + " Fitness: " + str(fitness) + " Frames: "+str(frame))
 
             genome.fitness = fitness
 
@@ -112,13 +111,13 @@ config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
 p = neat.Population(config)
 
 #insert desired filename to load a checkpoint
-#p = neat.Checkpointer.restore_checkpoint("neat-checkpoint-24")
+p = neat.Checkpointer.restore_checkpoint("neat-checkpoint-78")
 
 #Creates statistics for each generation
 p.add_reporter(neat.StdOutReporter(True))
 stats = neat.StatisticsReporter()
 p.add_reporter(stats)
-p.add_reporter(neat.Checkpointer(10))
+p.add_reporter(neat.Checkpointer(10,10000))
 
 winner = p.run(evaluate_genomes)
 
