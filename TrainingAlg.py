@@ -118,7 +118,7 @@ config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
 p = neat.Population(config)
 
 #insert desired filename to load a checkpoint
-p = neat.Checkpointer.restore_checkpoint("neat-checkpoint-78")
+#p = neat.Checkpointer.restore_checkpoint("neat-checkpoint-78")
 
 #Creates statistics for each generation
 p.add_reporter(neat.StdOutReporter(True))
