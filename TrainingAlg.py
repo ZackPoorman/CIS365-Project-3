@@ -4,6 +4,13 @@ import cv2          #pip install opencv-python==4.1.2.30
 import neat         #pip install neat-python
 import pickle       #pip install pickle
 
+#IMPORTANT! You need the ROMS of Balloon Fight and Arkanoid to run this.
+
+#Note the original config-feedforward file was taken from https://gitlab.com/lucasrthompson/Sonic-Bot-In-OpenAI-and-NEAT and we tweaked it for our needs.
+#We used the Sonic tutorial as a base to familiarize ourselves with. 
+#We then implemented the NEAT algorithm based on the OpenAI-Gym-Retro features for Balloon Fight (score and pixel of water).
+#To run: ./TrainingAlg.py
+
 #Swap BalloonFight with Arkanoid and vice versa
 env = retro.make('BalloonFight-Nes', 'Level1')
 screen_input = []
